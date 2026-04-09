@@ -9,6 +9,7 @@ fastparquet>=2024.11.0
 numpy==2.3.5
 scipy==1.16.3
 scikit-learn>=1.7.2
+nltk>=3.8.1
 
 # Static Files & Performance
 whitenoise[brotli]==6.11.0
