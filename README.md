@@ -6,6 +6,7 @@
 [![Django](https://img.shields.io/badge/Django-6.0-green.svg)](https://djangoproject.com/)
 [![Airflow](https://img.shields.io/badge/Airflow-2.10.4-orange.svg)](https://airflow.apache.org/)
 [![MLOps](https://img.shields.io/badge/MLOps-Automated-success.svg)](./airflow)
+[![Platform](https://img.shields.io/badge/Platform-GitHub%20Codespaces-blue.svg)](https://github.com/features/codespaces)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
@@ -194,7 +195,7 @@ Replace `your_kaggle_username` and `your_kaggle_api_key` with the values from yo
 # 2. Train the recommendation model (~10-15 minutes)
 # 3. Save model files to ./training/models/
 
-python download_and_train.py
+python scripts/download_and_train.py
 ```
 
 **Training Configuration:**
@@ -307,9 +308,21 @@ Year: 2023
 movie-recommendation-system/
 │
 ├── 📚 Documentation
-│   ├── README.md                  # This file - overview and quick start
-│   ├── PROJECT_GUIDE.md           # Complete technical guide
-│   └── CHANGELOG.md               # Version history and changes
+│   ├── README.md                  # Main project documentation
+│   ├── LICENSE                    # MIT License
+│   └── docs/                      # Detailed documentation
+│       ├── README.md              # Documentation index
+│       ├── README.md              # Documentation index
+│       ├── CODESPACES_GUIDE.md    # Complete Codespaces + Airflow setup
+│       ├── PROJECT_GUIDE.md       # Technical guide & API reference
+│       └── CHANGELOG.md           # Version history
+│
+├── 🛠️ Utility Scripts
+│   └── scripts/                   # Utility and testing scripts
+│       ├── README.md              # Scripts documentation
+│       ├── download_and_train.py  # Dataset download & training
+│       ├── test_airflow_dag.py    # Airflow DAG verification
+│       └── run_airflow_pipeline_manually.py  # Pipeline demo
 │
 ├── ⚙️ Django Application
 │   ├── movie_recommendation/      # Django project settings
@@ -328,46 +341,36 @@ movie-recommendation-system/
 │   │
 │   ├── manage.py                 # Django management script
 │   ├── requirements.txt          # Python dependencies
-│   ├── download_and_train.py     # Automated training script
 │   └── .env                      # Environment variables (create this)
 │
 ├── 🎓 Model Training
-│   ├── training/
-│   │   ├── train.py              # Training pipeline
-│   │   ├── infer.py              # Inference examples
-│   │   ├── guide.md              # Training documentation
-│   │   └── models/               # Trained model files (created after training)
-│   │       ├── movie_metadata.parquet    # Movie information
-│   │       ├── similarity_matrix.npz     # Similarity scores
-│   │       ├── title_to_idx.json         # Title mappings
-│   │       ├── config.json               # Model configuration
-│   │       ├── tfidf_vectorizer.pkl      # TF-IDF model
-│   │       └── svd_model.pkl             # SVD reduction model
+│   └── training/
+│       ├── train.py              # Training pipeline
+│       ├── infer.py              # Inference examples
+│       ├── guide.md              # Training documentation
+│       └── models/               # Trained model files (3.4GB)
+│           ├── movie_metadata.parquet    # Movie information
+│           ├── similarity_matrix.npz     # Similarity scores
+│           ├── title_to_idx.json         # Title mappings
+│           ├── config.json               # Model configuration
+│           ├── tfidf_vectorizer.pkl      # TF-IDF model
+│           └── svd_model.pkl             # SVD reduction model
 │
 ├── 🔄 Apache Airflow - MLOps Pipeline
-│   ├── airflow/
-│   │   ├── dags/
-│   │   │   └── movie_recommender_retrain_dag.py  # Main DAG (10 tasks)
-│   │   ├── logs/                                  # Airflow execution logs
-│   │   ├── plugins/                               # Custom Airflow plugins
-│   │   ├── backups/                               # Model backups (auto-created)
-│   │   ├── airflow.cfg                            # Airflow configuration
-│   │   ├── airflow.db                             # Airflow metadata database
-│   │   ├── README.md                              # Airflow documentation
-│   │   └── init_airflow.sh/.bat                   # Initialization scripts
-│   │
-│   ├── test_airflow_dag.py                        # DAG verification script
-│   ├── run_airflow_pipeline_manually.py           # Pipeline demo script
-│   ├── airflow_integration_demo.html              # Visual dashboard
-│   ├── AIRFLOW_STATUS.md                          # Integration status report
-│   ├── AIRFLOW_DEMO_WINDOWS.md                    # Demo guide
-│   └── AIRFLOW_WINDOWS_GUIDE.md                   # Setup instructions
+│   └── airflow/
+│       ├── dags/
+│       │   └── movie_recommender_retrain_dag.py  # Main DAG (10 tasks)
+│       ├── logs/                  # Airflow execution logs
+│       ├── plugins/               # Custom Airflow plugins
+│       ├── backups/               # Model backups (auto-created)
+│       ├── airflow.cfg            # Airflow configuration
+│       ├── airflow.db             # Airflow metadata database
+│       ├── README.md              # Airflow documentation
+│       └── init_airflow.sh/.bat   # Initialization scripts
 │
-├── 📦 Static Files
-│   └── static/
-│       └── logo.ico              # Application logo
-│
-├── 📊 Assets
+├── 📦 Static Files & Assets
+│   ├── static/
+│   │   └── logo.ico              # Application logo
 │   └── assets/
 │       ├── images-for-readme/    # README screenshots
 │       └── demo-video/           # Demo GIF
@@ -392,8 +395,8 @@ movie-recommendation-system/
 - **`recommender/views.py`** - Recommendation engine
 - **`training/models/`** - All trained model files (created after training)
 - **`airflow/dags/movie_recommender_retrain_dag.py`** - Airflow DAG (10 tasks, 389 lines)
-- **`test_airflow_dag.py`** - Verify Airflow integration (run this!)
-- **`airflow_integration_demo.html`** - Visual dashboard (open in browser)
+- **`scripts/test_airflow_dag.py`** - Verify Airflow integration (run this!)
+- **`docs/CODESPACES_GUIDE.md`** - Complete setup guide for GitHub Codespaces
 
 ---
 
@@ -458,7 +461,7 @@ The easiest way to train the model is using the included `download_and_train.py`
 
 **Training Command:**
 ```bash
-python download_and_train.py
+python scripts/download_and_train.py
 ```
 
 **What Happens:**
@@ -514,7 +517,7 @@ df, sim_matrix = trainer.train(
 
 **For detailed training instructions**, see:
 - 📘 [Training Guide](training/guide.md) - Complete training documentation
-- 📘 [PROJECT_GUIDE.md](PROJECT_GUIDE.md#-model-training) - Training setup and configurations
+- 📘 [docs/PROJECT_GUIDE.md](docs/PROJECT_GUIDE.md#-model-training) - Training setup and configurations
 
 ### Re-training the Model
 
@@ -525,7 +528,7 @@ To retrain with different settings or update with new data:
 rm -rf training/models/*
 
 # 2. Run training script again
-python download_and_train.py
+python scripts/download_and_train.py
 
 # 3. Restart Django server
 python manage.py runserver
@@ -575,7 +578,7 @@ This project includes **Apache Airflow 2.10.4** for automated ML pipeline orches
 **Quick Verification (5 seconds):**
 ```bash
 # Run automated tests
-./venv/Scripts/python test_airflow_dag.py
+./venv/Scripts/python scripts/test_airflow_dag.py
 ```
 
 **Expected Output:**
@@ -593,7 +596,7 @@ SUCCESS - All Tests Passed!
 **Interactive Demo (2 minutes):**
 ```bash
 # Run the pipeline demonstration
-./venv/Scripts/python run_airflow_pipeline_manually.py
+./venv/Scripts/python scripts/run_airflow_pipeline_manually.py
 # Choose option 2 for light run
 ```
 
@@ -603,53 +606,25 @@ export AIRFLOW_HOME=$(pwd)/airflow
 ./venv/Scripts/airflow tasks test movie_recommender_retraining check_kaggle_credentials 2024-01-01
 ```
 
-### Visual Dashboard
+### Running Full Airflow on GitHub Codespaces
 
-Open the integration dashboard in your browser:
-```bash
-# Windows
-start airflow_integration_demo.html
+> **Platform**: This project is optimized for **GitHub Codespaces (Ubuntu)** where Airflow runs natively with full features.
 
-# macOS/Linux
-open airflow_integration_demo.html
-```
+**Quick Setup:**
+1. Open Codespace from repository
+2. Configure `.env` with Kaggle credentials  
+3. Run: `bash deployment/codespaces/start_codespaces.sh`
+4. Access Airflow UI on port 8080 (login: admin/admin)
+5. Access Django app on port 8000
 
-Shows complete DAG configuration, task pipeline, and verification results.
+**Full Guide:** See [docs/CODESPACES_GUIDE.md](docs/CODESPACES_GUIDE.md) for complete instructions.
 
-### Running Full Airflow (Linux/WSL2/Docker Required)
-
-⚠️ **Important:** Airflow webserver requires Unix-specific modules and cannot run natively on Windows. Use one of these options:
-
-**Option 1: WSL2 (Recommended for Windows)**
-```bash
-# Install WSL2
-wsl --install
-
-# Inside WSL2
-export AIRFLOW_HOME=$(pwd)/airflow
-airflow db init
-airflow users create --username admin --password admin \
-    --firstname Admin --lastname User --role Admin \
-    --email admin@example.com
-airflow standalone
-
-# Access at http://localhost:8080
-```
-
-**Option 2: Docker**
-```bash
-# Use the provided docker-compose file
-docker-compose -f docker-compose-airflow.yml up
-
-# Access at http://localhost:8080
-# Username: admin, Password: admin
-```
-
-**Option 3: GitHub Codespaces (Free)**
-- Push code to GitHub
-- Create Codespace (includes Linux)
-- Run Airflow commands
-- Forward port 8080
+**Why Codespaces?**
+- ✅ Native Airflow support (no workarounds needed)
+- ✅ Full webserver + scheduler
+- ✅ 60 hours/month free tier
+- ✅ Pre-configured environment
+- ✅ Access from any browser
 
 ### Airflow Configuration
 
@@ -657,9 +632,8 @@ docker-compose -f docker-compose-airflow.yml up
 - `airflow/dags/movie_recommender_retrain_dag.py` - Complete DAG (389 lines)
 - `airflow/airflow.cfg` - Airflow configuration
 - `airflow/airflow.db` - Initialized metadata database
-- `test_airflow_dag.py` - Verification script
-- `run_airflow_pipeline_manually.py` - Demo script
-- `airflow_integration_demo.html` - Visual dashboard
+- `scripts/test_airflow_dag.py` - Verification script
+- `scripts/run_airflow_pipeline_manually.py` - Demo script
 
 **Configuration Details:**
 - Executor: SequentialExecutor (LocalExecutor for production)
@@ -774,7 +748,7 @@ GET /api/health/
 }
 ```
 
-For complete API documentation, see [PROJECT_GUIDE.md - API Reference](PROJECT_GUIDE.md#-api-reference)
+For complete API documentation, see [docs/PROJECT_GUIDE.md - API Reference](docs/PROJECT_GUIDE.md#-api-reference)
 
 ---
 
@@ -815,7 +789,7 @@ export MODEL_DIR=./models
 export MODEL_DIR=/path/to/your/models
 ```
 
-For detailed configuration options, see [PROJECT_GUIDE.md - Configuration](PROJECT_GUIDE.md#-configuration)
+For detailed configuration options, see [docs/PROJECT_GUIDE.md - Configuration](docs/PROJECT_GUIDE.md#-configuration)
 
 ---
 
@@ -824,7 +798,7 @@ For detailed configuration options, see [PROJECT_GUIDE.md - Configuration](PROJE
 ### Main Documentation
 
 - **[README.md](README.md)** (this file) - Overview, quick start, basic usage
-- **[PROJECT_GUIDE.md](PROJECT_GUIDE.md)** - Complete technical guide
+- **[docs/PROJECT_GUIDE.md](docs/PROJECT_GUIDE.md)** - Complete technical guide
   - Installation
   - Model training
   - Configuration
@@ -844,43 +818,33 @@ For detailed configuration options, see [PROJECT_GUIDE.md - Configuration](PROJE
 
 ### Airflow/MLOps Documentation
 
-- **[airflow/README.md](airflow/README.md)** - Complete Airflow guide (374 lines)
-  - DAG overview and task breakdown
-  - Setup instructions (initialization, user creation)
-  - Running and monitoring pipelines
-  - Configuration and scheduling
+- **[docs/CODESPACES_GUIDE.md](docs/CODESPACES_GUIDE.md)** - Complete Codespaces + Airflow setup
+  - Quick 3-step setup
+  - Full Airflow features (webserver, scheduler, UI)
+  - Django app deployment
+  - Troubleshooting and monitoring
+- **[airflow/README.md](airflow/README.md)** - Technical Airflow documentation
+  - DAG structure and task details
+  - Configuration reference
   - Production deployment best practices
-- **[AIRFLOW_STATUS.md](AIRFLOW_STATUS.md)** - Integration status report
-  - Test results and verification
-  - What's implemented and working
-  - Demonstration instructions
-- **[AIRFLOW_DEMO_WINDOWS.md](AIRFLOW_DEMO_WINDOWS.md)** - Windows demonstration guide
-  - How to verify integration on Windows
-  - Manual pipeline execution
-  - Interview talking points
-- **[AIRFLOW_WINDOWS_GUIDE.md](AIRFLOW_WINDOWS_GUIDE.md)** - Windows setup guide
-  - WSL2 setup instructions
-  - Docker configuration
-  - GitHub Codespaces option
-  - Troubleshooting tips
-- **[airflow_integration_demo.html](airflow_integration_demo.html)** - Visual dashboard
-  - Open in browser to see complete integration status
-  - Task pipeline visualization
-  - Verification results
+- **[docs/PROJECT_GUIDE.md](docs/PROJECT_GUIDE.md)** - Complete technical guide
+  - Architecture overview
+  - API reference
+  - Deployment instructions
 
 ### Quick Links
 
 | Topic | Documentation |
 |-------|---------------|
-| Installation | [Quick Start](#-quick-start) or [PROJECT_GUIDE.md](PROJECT_GUIDE.md#-installation) |
+| Installation | [Quick Start](#-quick-start) or [docs/PROJECT_GUIDE.md](docs/PROJECT_GUIDE.md#-installation) |
 | Model Training | [training/guide.md](training/guide.md) |
+| **Airflow + Codespaces Setup** | **[docs/CODESPACES_GUIDE.md](docs/CODESPACES_GUIDE.md)** |
 | **Airflow Integration** | **[airflow/README.md](airflow/README.md)** or [Airflow Section](#-apache-airflow---mlops-pipeline) |
-| **Airflow Demo** | **[AIRFLOW_DEMO_WINDOWS.md](AIRFLOW_DEMO_WINDOWS.md)** |
-| **Verify Airflow** | **Run `./venv/Scripts/python test_airflow_dag.py`** |
-| Deployment | [PROJECT_GUIDE.md - Deployment](PROJECT_GUIDE.md#-deployment) |
-| API Reference | [API Reference](#-api-reference) or [PROJECT_GUIDE.md](PROJECT_GUIDE.md#-api-reference) |
-| Troubleshooting | [PROJECT_GUIDE.md - Troubleshooting](PROJECT_GUIDE.md#-troubleshooting) |
-| Configuration | [Configuration](#-configuration) or [PROJECT_GUIDE.md](PROJECT_GUIDE.md#-configuration) |
+| **Verify Airflow** | **Run `python scripts/test_airflow_dag.py`** |
+| Deployment | [docs/PROJECT_GUIDE.md - Deployment](docs/PROJECT_GUIDE.md#-deployment) |
+| API Reference | [API Reference](#-api-reference) or [docs/PROJECT_GUIDE.md](docs/PROJECT_GUIDE.md#-api-reference) |
+| Troubleshooting | [docs/PROJECT_GUIDE.md - Troubleshooting](docs/PROJECT_GUIDE.md#-troubleshooting) |
+| Configuration | [Configuration](#-configuration) or [docs/PROJECT_GUIDE.md](docs/PROJECT_GUIDE.md#-configuration) |
 
 ---
 
@@ -901,7 +865,7 @@ For detailed configuration options, see [PROJECT_GUIDE.md - Configuration](PROJE
 - **AWS**: Elastic Beanstalk compatible
 - **Digital Ocean**: App Platform ready
 
-For detailed deployment instructions, see [PROJECT_GUIDE.md - Deployment](PROJECT_GUIDE.md#-deployment)
+For detailed deployment instructions, see [docs/PROJECT_GUIDE.md - Deployment](docs/PROJECT_GUIDE.md#-deployment)
 
 ---
 
@@ -966,7 +930,7 @@ pip install nltk
 ```bash
 # Set UTF-8 encoding before running
 set PYTHONIOENCODING=utf-8
-python download_and_train.py
+python scripts/download_and_train.py
 ```
 
 #### 5. Model Files Not Found
@@ -982,7 +946,7 @@ python download_and_train.py
 - Required files: `movie_metadata.parquet`, `similarity_matrix.npz`, `title_to_idx.json`, `config.json`
 - Re-run training if files are missing:
   ```bash
-  python download_and_train.py
+  python scripts/download_and_train.py
   ```
 
 #### 6. Out of Memory During Training
@@ -1049,7 +1013,7 @@ python manage.py runserver 8080
 If your issue isn't listed here:
 1. Check the server logs in the terminal
 2. Look for error messages in browser console (F12)
-3. Review [PROJECT_GUIDE.md](PROJECT_GUIDE.md) for detailed documentation
+3. Review [docs/PROJECT_GUIDE.md](docs/PROJECT_GUIDE.md) for detailed documentation
 4. Check [training/guide.md](training/guide.md) for training-specific issues
 
 ---
@@ -1058,7 +1022,7 @@ If your issue isn't listed here:
 
 Need help? Here are your options:
 
-- 📖 **Documentation**: Check [PROJECT_GUIDE.md](PROJECT_GUIDE.md) for detailed guides
+- 📖 **Documentation**: Check [docs/PROJECT_GUIDE.md](docs/PROJECT_GUIDE.md) for detailed guides
 - 🎓 **Training Help**: See [training/guide.md](training/guide.md) for model training
 - 🐛 **Issues**: [Open an issue](https://github.com/yourusername/movie-recommendation-system/issues) on GitHub
 - 💬 **Discussions**: [GitHub Discussions](https://github.com/yourusername/movie-recommendation-system/discussions)

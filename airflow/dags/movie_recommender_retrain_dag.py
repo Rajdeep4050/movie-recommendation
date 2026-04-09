@@ -73,16 +73,39 @@ def check_kaggle_credentials(**context):
 
 def download_dataset(**context):
     """
-    Task 2: Download latest TMDB dataset from Kaggle
+    Task 2: Download latest TMDB dataset from Kaggle (with caching)
     """
     import kagglehub
     from dotenv import load_dotenv
+    import json
+    from datetime import datetime, timedelta
+    import shutil
 
     load_dotenv()
     os.environ['KAGGLE_USERNAME'] = os.getenv('KAGGLE_USERNAME')
     os.environ['KAGGLE_KEY'] = os.getenv('KAGGLE_KEY')
 
-    print("Downloading TMDB dataset from Kaggle...")
+    # Cache configuration
+    CACHE_DIR = PROJECT_ROOT / "datasets" / "kaggle" / "tmdb-movies"
+    CACHE_METADATA = CACHE_DIR / ".cache_metadata.json"
+    CACHE_TTL_DAYS = 30
+
+    # Check cache validity
+    if CACHE_METADATA.exists():
+        with open(CACHE_METADATA, 'r') as f:
+            metadata = json.load(f)
+            cache_date = datetime.fromisoformat(metadata['downloaded_at'])
+            cache_age = datetime.now() - cache_date
+
+            if cache_age < timedelta(days=CACHE_TTL_DAYS):
+                csv_path = metadata['csv_path']
+                if Path(csv_path).exists():
+                    print(f"[CACHE HIT] Using cached dataset from {cache_date.strftime('%Y-%m-%d')}")
+                    print(f"Cache age: {cache_age.days} days (TTL: {CACHE_TTL_DAYS} days)")
+                    context['task_instance'].xcom_push(key='dataset_path', value=csv_path)
+                    return csv_path
+
+    print("[CACHE MISS] Downloading fresh dataset from Kaggle...")
     dataset_path = kagglehub.dataset_download("asaniczka/tmdb-movies-dataset-2023-930k-movies")
 
     # Find CSV file
@@ -91,11 +114,25 @@ def download_dataset(**context):
         raise FileNotFoundError("No CSV file found in downloaded dataset")
 
     csv_path = str(csv_files[0])
-    print(f"[OK] Dataset downloaded: {csv_path}")
 
-    # Push to XCom
-    context['task_instance'].xcom_push(key='dataset_path', value=csv_path)
-    return csv_path
+    # Copy to cache directory
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    cached_csv = CACHE_DIR / Path(csv_path).name
+    shutil.copy2(csv_path, cached_csv)
+
+    # Save metadata
+    metadata = {
+        'downloaded_at': datetime.now().isoformat(),
+        'csv_path': str(cached_csv),
+        'original_path': dataset_path,
+        'dataset_id': 'asaniczka/tmdb-movies-dataset-2023-930k-movies'
+    }
+    with open(CACHE_METADATA, 'w') as f:
+        json.dump(metadata, f, indent=2)
+
+    print(f"[OK] Dataset cached: {cached_csv}")
+    context['task_instance'].xcom_push(key='dataset_path', value=str(cached_csv))
+    return str(cached_csv)
 
 
 def validate_dataset(**context):

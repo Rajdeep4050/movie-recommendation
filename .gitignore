@@ -48,6 +48,7 @@ logs/
 # OS
 .DS_Store
 Thumbs.db
+*.stackdump
 
 # Testing
 .coverage
@@ -76,6 +77,10 @@ airflow/webserver_config.py
 airflow/*.pid
 airflow/*.err
 airflow/*.out
+
+# Dataset cache
+datasets/
+.kaggle/
 
 # Keep important JSON config files
 !training/models/config.json
