@@ -112,7 +112,7 @@ except Exception as e:
     print("  1. Visit https://www.kaggle.com/settings")
     print("  2. Create API token (downloads kaggle.json)")
     print("  3. Place in: ~/.kaggle/kaggle.json (Linux/Mac)")
-    print("              %USERPROFILE%\.kaggle\kaggle.json (Windows)")
+    print(r"              %USERPROFILE%\.kaggle\kaggle.json (Windows)")
     sys.exit(1)
 
 # Step 2: Train model
@@ -127,7 +127,8 @@ print("\nThis will take 10-15 minutes...")
 print("-" * 70)
 
 try:
-    sys.path.insert(0, str(Path(__file__).parent / 'training'))
+    # Add training directory to path (go up to project root, then into training)
+    sys.path.insert(0, str(Path(__file__).parent.parent / 'training'))
     from train import MovieRecommenderTrainer
     
     trainer = MovieRecommenderTrainer(
