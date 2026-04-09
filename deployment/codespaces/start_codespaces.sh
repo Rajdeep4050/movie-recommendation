@@ -10,11 +10,18 @@ GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# Get project root (2 levels up from this script)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+# Change to project root
+cd "$PROJECT_ROOT"
+
 # Set Airflow home
-export AIRFLOW_HOME=$(pwd)/airflow
+export AIRFLOW_HOME=$PROJECT_ROOT/airflow
 
 # Check if .env exists (in project root)
-if [ ! -f ../../.env ]; then
+if [ ! -f .env ]; then
     echo "Creating .env file..."
     echo "Please add your Kaggle credentials in project root:"
     echo ""
