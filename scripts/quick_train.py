@@ -114,7 +114,7 @@ try:
 
     df, sim_matrix = trainer.train(
         csv_path,
-        quality='high',  # 200+ votes = fewer movies
+        quality_threshold='high',  # 200+ votes = fewer movies
         max_movies=10000  # Limit to 10k movies for Codespaces
     )
 
