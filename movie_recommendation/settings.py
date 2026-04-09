@@ -23,18 +23,17 @@ ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(','
 
 # GitHub Codespaces support
 CODESPACE_NAME = os.environ.get('CODESPACE_NAME')
-if CODESPACE_NAME:
-    # Allow Codespaces forwarded ports
-    ALLOWED_HOSTS.extend([
-        f'{CODESPACE_NAME}-8000.app.github.dev',
-        f'{CODESPACE_NAME}-8000.preview.app.github.dev',
-        '.app.github.dev',  # Wildcard for all Codespaces domains
-        '.preview.app.github.dev',
-    ])
+GITHUB_CODESPACES = os.environ.get('GITHUB_CODESPACES')
+
+if CODESPACE_NAME or GITHUB_CODESPACES:
+    # Allow all Codespaces domains (broad permissions for development)
+    ALLOWED_HOSTS = ['*']  # Allow all hosts in Codespaces
 
 # Render deployment support
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
+    if ALLOWED_HOSTS == ['*']:
+        ALLOWED_HOSTS = []
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # CSRF trusted origins for Codespaces
@@ -43,6 +42,14 @@ if CODESPACE_NAME:
     CSRF_TRUSTED_ORIGINS.extend([
         f'https://{CODESPACE_NAME}-8000.app.github.dev',
         f'https://{CODESPACE_NAME}-8000.preview.app.github.dev',
+        'https://*.app.github.dev',
+        'https://*.preview.app.github.dev',
+    ])
+elif GITHUB_CODESPACES:
+    # Fallback if CODESPACE_NAME not set
+    CSRF_TRUSTED_ORIGINS.extend([
+        'https://*.app.github.dev',
+        'https://*.preview.app.github.dev',
     ])
 
 ADMIN_ENABLED = os.environ.get('ADMIN_ENABLED', 'False').lower() in ('true', '1', 't')
