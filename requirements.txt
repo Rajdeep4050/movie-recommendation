@@ -31,3 +31,7 @@ django-cors-headers==4.9.0
 
 # MLOps & Workflow Orchestration
 apache-airflow==2.10.4
+
+# Kaggle Dataset Download
+kagglehub>=0.2.0
+python-dotenv>=1.0.0
