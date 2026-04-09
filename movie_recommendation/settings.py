@@ -21,10 +21,29 @@ DEBUG = os.environ.get('DEBUG', 'True').lower() in ('true', '1', 't')
 # Allowed hosts configuration
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
+# GitHub Codespaces support
+CODESPACE_NAME = os.environ.get('CODESPACE_NAME')
+if CODESPACE_NAME:
+    # Allow Codespaces forwarded ports
+    ALLOWED_HOSTS.extend([
+        f'{CODESPACE_NAME}-8000.app.github.dev',
+        f'{CODESPACE_NAME}-8000.preview.app.github.dev',
+        '.app.github.dev',  # Wildcard for all Codespaces domains
+        '.preview.app.github.dev',
+    ])
+
 # Render deployment support
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
+# CSRF trusted origins for Codespaces
+CSRF_TRUSTED_ORIGINS = []
+if CODESPACE_NAME:
+    CSRF_TRUSTED_ORIGINS.extend([
+        f'https://{CODESPACE_NAME}-8000.app.github.dev',
+        f'https://{CODESPACE_NAME}-8000.preview.app.github.dev',
+    ])
 
 ADMIN_ENABLED = os.environ.get('ADMIN_ENABLED', 'False').lower() in ('true', '1', 't')
 
