@@ -1,0 +1,82 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+/staticfiles/
+/media/
+logs/
+
+# Environment variables
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Deployment
+*.pyc
+*.csv
+
+# Machine Learning Models (large files)
+*.pkl
+*.npy
+*.parquet
+*.npz
+
+# Airflow
+airflow/airflow.db
+airflow/airflow.db-shm
+airflow/airflow.db-wal
+airflow/logs/*
+!airflow/logs/.gitkeep
+airflow/backups/*
+!airflow/backups/.gitkeep
+airflow/webserver_config.py
+airflow/*.pid
+airflow/*.err
+airflow/*.out
+
+# Keep important JSON config files
+!training/models/config.json
+!training/models/title_to_idx.json

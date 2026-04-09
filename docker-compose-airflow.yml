@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  airflow:
+    image: apache/airflow:2.10.4-python3.11
+    container_name: movie-recommender-airflow
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - AIRFLOW__CORE__DAGS_FOLDER=/opt/airflow/dags
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////opt/airflow/airflow.db
+      - AIRFLOW__WEBSERVER__SECRET_KEY=changeme
+      - _AIRFLOW_WWW_USER_CREATE=True
+      - _AIRFLOW_WWW_USER_USERNAME=admin
+      - _AIRFLOW_WWW_USER_PASSWORD=admin
+      - AIRFLOW_UID=50000
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      - ./training:/opt/airflow/training
+      - ./.env:/opt/airflow/.env
+      - ./download_and_train.py:/opt/airflow/download_and_train.py
+    command: >
+      bash -c "
+        airflow db migrate &&
+        airflow users create --username admin --firstname Admin --lastname User --role Admin --email admin@example.com --password admin || true &&
+        airflow standalone
+      "
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+# Instructions:
+# 1. Install Docker Desktop for Windows from https://www.docker.com/products/docker-desktop
+# 2. Run: docker-compose -f docker-compose-airflow.yml up
+# 3. Access: http://localhost:8080 (username: admin, password: admin)
+# 4. Find your DAG: movie_recommender_retraining
+# 5. Enable and trigger the DAG
