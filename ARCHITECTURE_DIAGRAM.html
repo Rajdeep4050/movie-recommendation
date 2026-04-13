@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommendation System - Architecture Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 1200px;
+            width: 100%;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .mermaid {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            overflow-x: auto;
+            min-height: 800px;
+        }
+        
+        .legend {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+        
+        .legend-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .legend-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        
+        .legend-item {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .legend-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .legend-item strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .legend-item p {
+            color: #555;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .metric-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .metric-desc {
+            font-size: 0.85em;
+            color: #666;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #999;
+            font-size: 0.9em;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 Movie Recommendation System</h1>
+            <p class="subtitle">Architecture Diagram - Complete System Flow</p>
+        </header>
+        
+        <div class="mermaid">
+graph TB
+    subgraph USER["👤 USER INTERACTION LAYER"]
+        Browser["🌐 Web Browser<br/>Django Frontend<br/>index.html"]
+    end
+    
+    subgraph WEB["🔗 WEB APPLICATION LAYER"]
+        Django["Django 6.0 Backend<br/>views.py + urls.py"]
+        FuzzyMatch["🔍 Fuzzy Matching<br/>get_close_matches<br/>difflib"]
+        HealthCheck["💚 Health Check<br/>Model Status"]
+    end
+    
+    subgraph ML["🤖 ML INFERENCE ENGINE"]
+        Loader["Model Loader<br/>Background Thread<br/>Async Load"]
+        Vectorizer["TF-IDF Vectorizer<br/>Text → Sparse Vectors<br/>~20K Dimensions"]
+        Reducer["SVD Reducer<br/>300 Components<br/>Explains 85% Variance"]
+        Similarity["⚡ Cosine Similarity<br/>Precomputed<br/>O1 Lookup"]
+    end
+    
+    subgraph STORAGE["💾 PERSISTENT MODEL STORAGE"]
+        Metadata["📊 movie_metadata<br/>Parquet Format<br/>1.1 MB<br/>6248 movies"]
+        SimilarityMatrix["🗂️ similarity_matrix<br/>Sparse Matrix NPZ<br/>145 MB<br/>6248×6248"]
+        TitleIdx["📇 title_to_idx<br/>JSON Mapping<br/>159 KB<br/>Title → Index"]
+        TFIDFPkl["⚙️ tfidf_vectorizer<br/>Pickle Binary<br/>410 KB<br/>Fitted Model"]
+        SVDPkl["📐 svd_model<br/>Pickle Binary<br/>24 MB<br/>Trained SVD"]
+        Config["⚙️ config.json<br/>Model Config<br/>Meta Info"]
+    end
+    
+    subgraph MLOPS["📅 AIRFLOW ML ORCHESTRATION"]
+        Scheduler["Apache Airflow v2.10.4<br/>Weekly Schedule<br/>Sunday 2 AM"]
+        Check["✓ Check Credentials<br/>Kaggle Auth"]
+        Download["📥 Download Dataset<br/>1.4M Movies TMDB<br/>30-day Cache"]
+        Validate["🔎 Validate Data<br/>Quality Checks"]
+        Train["🏋️ Train Model<br/>TF-IDF + SVD<br/>15-20 min"]
+        Evaluate["📈 Evaluate<br/>Recall@k<br/>NDCG Metrics"]
+        Deploy["🚀 Deploy<br/>Move to Production"]
+        Backup["💾 Backup<br/>Version Control"]
+        Notify["📧 Notify<br/>Send Status"]
+        Restart["🔄 Restart<br/>Django Server"]
+    end
+    
+    subgraph DATA["📊 DATA SOURCES"]
+        Kaggle["🎬 Kaggle API<br/>TMDB Dataset<br/>1.4M Movies<br/>30+ Features"]
+    end
+    
+    subgraph RESULTS["✅ RESPONSE LAYER"]
+        ResultTemplate["result.html<br/>Top 15 Recommendations<br/>Genres, Rating, Poster"]
+    end
+    
+    Browser -->|"1. Search<br/>POST /main"| Django
+    Django -->|"2. Find Movie"| FuzzyMatch
+    FuzzyMatch -->|"3. Get Index"| TitleIdx
+    Django -->|"4. Check Status"| HealthCheck
+    HealthCheck -->|"Model Ready?"| Loader
+    Loader -->|"Load on Startup"| STORAGE
+    Django -->|"5. Get Similarities"| Similarity
+    Similarity -->|"Precomputed Scores"| SimilarityMatrix
+    SimilarityMatrix -->|"Movie IDs"| Metadata
+    Similarity -->|"6. Return Scores"| ResultTemplate
+    ResultTemplate -->|"Display Results"| Browser
+    
+    Scheduler -->|"Weekly Trigger"| Check
+    Check -->|"Download Fresh"| Download
+    Download -->|"Data"| Kaggle
+    Download -->|"Validate"| Validate
+    Validate -->|"Train New"| Train
+    Train -->|"Extract Features"| Vectorizer
+    Vectorizer -->|"Reduce Dims"| Reducer
+    Reducer -->|"Compute Sims"| Similarity
+    Train -->|"Save Models"| STORAGE
+    Train -->|"Evaluate"| Evaluate
+    Evaluate -->|"Backup Old"| Backup
+    Backup -->|"Deploy New"| Deploy
+    Deploy -->|"Update Files"| STORAGE
+    Deploy -->|"Restart"| Restart
+    Restart -->|"Notify"| Notify
+    
+    style USER fill:#E3F2FD,stroke:#1976d2,stroke-width:2px,color:#000
+    style WEB fill:#FFF3E0,stroke:#f57c00,stroke-width:2px,color:#000
+    style ML fill:#F3E5F5,stroke:#7b1fa2,stroke-width:2px,color:#000
+    style STORAGE fill:#E8F5E9,stroke:#388e3c,stroke-width:2px,color:#000
+    style MLOPS fill:#E0F2F1,stroke:#00796b,stroke-width:2px,color:#000
+    style DATA fill:#FCE4EC,stroke:#c2185b,stroke-width:2px,color:#000
+    style RESULTS fill:#FFF9C4,stroke:#f57f17,stroke-width:2px,color:#000
+    
+    style Browser fill:#BBDEFB,stroke:#0d47a1,stroke-width:2px
+    style Django fill:#FFE0B2,stroke:#e65100,stroke-width:2px
+    style Loader fill:#F8BBD0,stroke:#880e4f,stroke-width:2px
+    style Similarity fill:#C8E6C9,stroke:#1b5e20,stroke-width:2px
+    style SimilarityMatrix fill:#A5D6A7,stroke:#2e7d32,stroke-width:2px
+    style Train fill:#B2DFDB,stroke:#004d40,stroke-width:2px
+        </div>
+
+        <div class="metrics">
+            <div class="metric-card">
+                <div class="metric-value">⚡ &lt;200ms</div>
+                <div class="metric-label">Request Latency</div>
+                <div class="metric-desc">Fuzzy match + similarity lookup</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">🏋️ 15-20min</div>
+                <div class="metric-label">Weekly Training</div>
+                <div class="metric-desc">Complete ML pipeline refresh</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">💾 145MB</div>
+                <div class="metric-label">Model Size</div>
+                <div class="metric-desc">Sparse 6248×6248 similarity matrix</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">📊 1.4M</div>
+                <div class="metric-label">Movie Dataset</div>
+                <div class="metric-desc">TMDB 30+ features per movie</div>
+            </div>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-title">🏗️ System Architecture Layers & Components</div>
+            <div class="legend-items">
+                <div class="legend-item">
+                    <strong>👤 User Interaction Layer</strong>
+                    <p>Django frontend (index.html) - Users search for movies via web browser. Handles GET/POST requests, form submission, displays recommendations in result.html.</p>
+                </div>
+                
+                <div class="legend-item">
+                    <strong>🔗 Web Application Layer</strong>
+                    <p><strong>Django 6.0</strong> backend processes requests, <strong>Fuzzy Matching</strong> (difflib) finds user's movie, <strong>Health Check</strong> validates model status. Runs on 0.0.0.0:8000.</p>
+                </div>
+                
+                <div class="legend-item">
+                    <strong>🤖 ML Inference Engine</strong>
+                    <p><strong>TF-IDF Vectorizer</strong> converts text features to sparse vectors (20K dimensions). <strong>SVD Reducer</strong> reduces to 300 components (85% variance). <strong>Cosine Similarity</strong> performs O(1) lookups on precomputed scores.</p>
+                </div>
+                
+                <div class="legend-item">
+                    <strong>💾 Model Storage (145 MB)</strong>
+                    <p><strong>similarity_matrix.npz</strong> (145MB) - Sparse 6248×6248 matrix. <strong>movie_metadata</strong> (1.1MB) - 6248 movies in Parquet. <strong>title_to_idx.json</strong> - Title→index mapping. <strong>Vectorizers</strong> (410KB + 24MB) - Trained TF-IDF & SVD models.</p>
+                </div>
+                
+                <div class="legend-item">
+                    <strong>📅 Airflow MLOps Pipeline</strong>
+                    <p><strong>Apache Airflow 2.10.4</strong> orchestrates 10 tasks weekly: Check Credentials → Download TMDB (1.4M movies) → Validate Data → Train Model (15-20min) → Evaluate → Deploy → Backup → Notify → Restart Django.</p>
+                </div>
+                
+                <div class="legend-item">
+                    <strong>📊 Data Source</strong>
+                    <p><strong>Kaggle TMDB API</strong> provides 1.4M movies with 30+ features (genres, keywords, ratings, cast, production companies). 30-day cache prevents redundant downloads.</p>
+                </div>
+
+                <div class="legend-item">
+                    <strong>⚡ Performance Characteristics</strong>
+                    <p><strong>Request latency:</strong> &lt;200ms (fuzzy match + similarity lookup). <strong>Model load:</strong> ~2 seconds (background thread). <strong>Weekly retrain:</strong> 15-20 minutes. <strong>Model accuracy:</strong> Evaluated with Recall@15 and NDCG metrics.</p>
+                </div>
+
+                <div class="legend-item">
+                    <strong>🔄 Request Flow</strong>
+                    <p>User searches → Django fuzzy-matches title → Gets movie index → Loads precomputed similarities → Returns top 15 + metadata. All data cached in memory for instant response.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>💡 <strong>Tech Stack:</strong> Django 6.0 | Apache Airflow 2.10.4 | scikit-learn (TF-IDF, SVD) | scipy.sparse | Kaggle TMDB API</p>
+            <p style="margin-top: 8px;">⚡ <strong>Request Flow:</strong> &lt;200ms | 🏋️ <strong>Daily Training:</strong> 15-20min | 💾 <strong>Model Size:</strong> 145MB sparse matrix | 📊 <strong>Dataset:</strong> 1.4M TMDB movies</p>
+            <p style="margin-top: 10px; color: #999;">Generated: April 13, 2026 | v2.0 - Detailed Technical Architecture with Subgraph Organization</p>
+        </div>
+    </div>
+    
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'default', securityLevel: 'loose' });
+        mermaid.contentLoaded();
+    </script>
+</body>
+</html>
