@@ -424,9 +424,13 @@
     <!-- Results Header -->
     <div class="results-header">
         <h1 class="results-title">
-            Movies like <span class="searched-movie">{{ input_movie_name }}</span>
+            {% if search_type == 'genre' %}
+                Top <span class="searched-movie">{{ genre|title }} Movies</span>
+            {% else %}
+                Movies like <span class="searched-movie">{{ input_movie_name }}</span>
+            {% endif %}
         </h1>
-        {% if source_movie %}
+        {% if source_movie and search_type == 'movie' %}
         <p class="results-subtitle">
             {{ source_movie.production }} | {{ source_movie.rating }} | {{ source_movie.genres }}
         </p>
@@ -463,6 +467,22 @@
                     <div class="movie-detail">
                         <span class="detail-icon">🏢</span>
                         <span>{{ movie.production }}</span>
+                    </div>
+                    <div class="movie-detail">
+                        <span class="detail-icon">⏱️</span>
+                        <span>{{ movie.runtime }}</span>
+                    </div>
+                    <div class="movie-detail">
+                        <span class="detail-icon">💰</span>
+                        <span>Budget: {{ movie.budget }}</span>
+                    </div>
+                    <div class="movie-detail">
+                        <span class="detail-icon">📈</span>
+                        <span>Revenue: {{ movie.revenue }}</span>
+                    </div>
+                    <div class="movie-detail">
+                        <span class="detail-icon">🌐</span>
+                        <span>{{ movie.original_language }}</span>
                     </div>
                 </div>
 

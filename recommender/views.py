@@ -91,7 +91,18 @@ class MovieRecommender:
         self,
         movie_title: str,
         n: int = 15,
-        min_rating: float = None
+        min_rating: float = None,
+        genre_filter: list = None,
+        country_filter: str = None,
+        language_filter: str = None,
+        year_min: int = None,
+        year_max: int = None,
+        runtime_min: int = None,
+        runtime_max: int = None,
+        budget_min: int = None,
+        budget_max: int = None,
+        revenue_min: int = None,
+        revenue_max: int = None
     ) -> Dict:
         """Get movie recommendations with optional filtering"""
         matched_title = self.find_movie(movie_title)
@@ -116,6 +127,55 @@ class MovieRecommender:
             if min_rating and movie['vote_average'] < min_rating:
                 continue
             
+            # Genre filter
+            if genre_filter:
+                movie_genres = movie['genres'] if isinstance(movie['genres'], list) else []
+                if not any(g.lower() in [gf.lower() for gf in genre_filter] for g in movie_genres):
+                    continue
+            
+            # Country filter
+            if country_filter:
+                movie_countries = movie['production_countries'] if isinstance(movie['production_countries'], list) else []
+                if country_filter.lower() not in [c.lower() for c in movie_countries]:
+                    continue
+            
+            # Language filter
+            if language_filter:
+                movie_languages = movie['spoken_languages'] if isinstance(movie['spoken_languages'], list) else []
+                if language_filter.lower() not in [l.lower() for l in movie_languages]:
+                    continue
+            
+            # Year filter
+            if year_min or year_max:
+                try:
+                    release_str = str(movie['release_date'])
+                    if len(release_str) >= 4:
+                        year = int(release_str.split('-')[0]) if '-' in release_str else int(release_str[:4])
+                        if year_min and year < year_min:
+                            continue
+                        if year_max and year > year_max:
+                            continue
+                except:
+                    continue
+            
+            # Runtime filter
+            if runtime_min and pd.notna(movie['runtime']) and movie['runtime'] < runtime_min:
+                continue
+            if runtime_max and pd.notna(movie['runtime']) and movie['runtime'] > runtime_max:
+                continue
+            
+            # Budget filter
+            if budget_min and pd.notna(movie['budget']) and movie['budget'] < budget_min:
+                continue
+            if budget_max and pd.notna(movie['budget']) and movie['budget'] > budget_max:
+                continue
+            
+            # Revenue filter
+            if revenue_min and pd.notna(movie['revenue']) and movie['revenue'] < revenue_min:
+                continue
+            if revenue_max and pd.notna(movie['revenue']) and movie['revenue'] > revenue_max:
+                continue
+            
             recommendations.append({
                 'title': movie['title'],
                 'release_date': movie['release_date'] if pd.notna(movie['release_date']) else 'Unknown',
@@ -124,6 +184,10 @@ class MovieRecommender:
                 'rating': f"{movie['vote_average']:.1f}/10" if pd.notna(movie['vote_average']) else 'N/A',
                 'votes': f"{movie['vote_count']:,}" if pd.notna(movie['vote_count']) else 'N/A',
                 'similarity_score': f"{score:.3f}",
+                'runtime': f"{int(movie['runtime'])} min" if pd.notna(movie['runtime']) else 'N/A',
+                'budget': f"${movie['budget']:,}" if pd.notna(movie['budget']) and movie['budget'] > 0 else 'N/A',
+                'revenue': f"${movie['revenue']:,}" if pd.notna(movie['revenue']) and movie['revenue'] > 0 else 'N/A',
+                'original_language': movie['original_language'] if pd.notna(movie['original_language']) else 'N/A',
                 'imdb_id': movie['imdb_id'] if pd.notna(movie['imdb_id']) else None,
                 'poster_url': f"https://image.tmdb.org/t/p/w500{movie['poster_path']}" if pd.notna(movie['poster_path']) else None,
                 'google_link': f"https://www.google.com/search?q={'+'.join(movie['title'].split())}+movie",
@@ -138,6 +202,54 @@ class MovieRecommender:
                 'genres': ', '.join(source_movie['genres'][:3]) if isinstance(source_movie['genres'], list) else 'N/A'
             },
             'recommendations': recommendations
+        }
+    
+    def search_by_genre(self, genre: str, n_results: int = 15) -> Dict:
+        """
+        Search for top movies by genre
+        
+        Args:
+            genre: Genre to search for (required)
+            n_results: Number of results to return
+        
+        Returns:
+            Dictionary with search results
+        """
+        df = self.metadata
+        
+        # Filter by genre
+        genre_movies = df[df['genres'].apply(
+            lambda x: genre in x if isinstance(x, (list, np.ndarray)) else False
+        )].copy()
+        
+        # Sort by rating and popularity
+        genre_movies['quality_score'] = genre_movies['vote_average'] * np.log1p(genre_movies['vote_count'])
+        genre_movies = genre_movies.sort_values('quality_score', ascending=False).head(n_results)
+        
+        results = []
+        for idx, row in genre_movies.iterrows():
+            results.append({
+                'title': row['title'],
+                'release_date': row['release_date'] if pd.notna(row['release_date']) else 'Unknown',
+                'production': row['primary_company'] if pd.notna(row['primary_company']) else 'Unknown',
+                'genres': ', '.join(row['genres'][:3]) if isinstance(row['genres'], list) else 'N/A',
+                'rating': f"{row['vote_average']:.1f}/10" if pd.notna(row['vote_average']) else 'N/A',
+                'votes': f"{row['vote_count']:,}" if pd.notna(row['vote_count']) else 'N/A',
+                'runtime': f"{int(row['runtime'])} min" if pd.notna(row['runtime']) else 'N/A',
+                'budget': f"${row['budget']:,}" if pd.notna(row['budget']) and row['budget'] > 0 else 'N/A',
+                'revenue': f"${row['revenue']:,}" if pd.notna(row['revenue']) and row['revenue'] > 0 else 'N/A',
+                'original_language': row['original_language'] if pd.notna(row['original_language']) else 'N/A',
+                'imdb_id': row['imdb_id'] if pd.notna(row['imdb_id']) else None,
+                'poster_url': f"https://image.tmdb.org/t/p/w500{row['poster_path']}" if pd.notna(row['poster_path']) else None,
+                'google_link': f"https://www.google.com/search?q={'+'.join(row['title'].split())}+movie",
+                'imdb_link': f"https://www.imdb.com/title/{row['imdb_id']}" if pd.notna(row['imdb_id']) else None
+            })
+        
+        return {
+            'search_type': 'genre',
+            'genre': genre,
+            'total_results': len(results),
+            'results': results
         }
 
 
@@ -238,46 +350,85 @@ def main(request):
         )
     
     # POST request - process search
-    movie_name = request.POST.get('movie_name', '').strip()
+    search_type = request.POST.get('search_type', 'movie')
     
-    if not movie_name:
+    if search_type == 'genre':
+        # Genre search
+        genre = request.POST.get('genre', '').strip()
+        
+        if not genre:
+            return render(
+                request,
+                'recommender/index.html',
+                {
+                    'all_movie_names': titles_list,
+                    'total_movies': len(titles_list),
+                    'error_message': 'Please select a genre.',
+                    'search_type': 'genre'
+                }
+            )
+        
+        # Get genre search results (no language filter)
+        result = recommender.search_by_genre(genre, n_results=15)
+        
         return render(
             request,
-            'recommender/index.html',
+            'recommender/result.html',
             {
                 'all_movie_names': titles_list,
-                'total_movies': len(titles_list),
-                'error_message': 'Please enter a movie name.',
+                'search_result': result,
+                'total_results': len(result['results']),
+                'search_type': 'genre',
+                'genre': genre,
+                'recommended_movies': result['results'],
+                'total_recommendations': len(result['results']),
             }
         )
     
-    # Get recommendations
-    result = recommender.get_recommendations(movie_name, n=15)
-    
-    if 'error' in result:
+    else:
+        # Movie search (default)
+        movie_name = request.POST.get('movie_name', '').strip()
+        
+        if not movie_name:
+            return render(
+                request,
+                'recommender/index.html',
+                {
+                    'all_movie_names': titles_list,
+                    'total_movies': len(titles_list),
+                    'error_message': 'Please enter a movie name.',
+                    'search_type': 'movie'
+                }
+            )
+        
+        # Get recommendations
+        result = recommender.get_recommendations(movie_name, n=15)
+        
+        if 'error' in result:
+            return render(
+                request,
+                'recommender/index.html',
+                {
+                    'all_movie_names': titles_list,
+                    'total_movies': len(titles_list),
+                    'input_movie_name': movie_name,
+                    'error_message': result['error'],
+                    'suggestions': result.get('suggestions', [])
+                }
+            )
+        
         return render(
             request,
-            'recommender/index.html',
+            'recommender/result.html',
             {
                 'all_movie_names': titles_list,
-                'total_movies': len(titles_list),
-                'input_movie_name': movie_name,
-                'error_message': result['error'],
-                'suggestions': result.get('suggestions', [])
+                'input_movie_name': result['query_movie'],
+                'source_movie': result['source_movie'],
+                'recommended_movies': result['recommendations'],
+                'total_recommendations': len(result['recommendations']),
+                'search_type': 'movie',
             }
         )
-    
-    return render(
-        request,
-        'recommender/result.html',
-        {
-            'all_movie_names': titles_list,
-            'input_movie_name': result['query_movie'],
-            'source_movie': result['source_movie'],
-            'recommended_movies': result['recommendations'],
-            'total_recommendations': len(result['recommendations']),
-        }
-    )
 
 
 @require_http_methods(["GET"])

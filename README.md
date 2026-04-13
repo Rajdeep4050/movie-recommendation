@@ -21,13 +21,14 @@ Content-based movie recommendation system using TF-IDF and SVD for similarity ma
 
 ## ✨ Features
 
-- 🔍 Smart movie search with real-time autocomplete
+- 🔍 Smart movie search with real-time autocomplete (handles typos like "startwars" → "Star Wars")
 - 🎬 AI recommendations (TF-IDF + SVD)
 - 📊 Handles 10K-1M+ movies efficiently
 - 🔄 Automated retraining pipeline (Airflow)
 - 💾 Dataset caching (saves 960MB/month bandwidth)
 - 📡 REST API endpoints
 - ⚡ Sub-50ms recommendation generation
+- 🎭 Separate search modes: Movie recommendations vs Genre discovery
 
 ---
 
@@ -112,8 +113,10 @@ airflow dags trigger movie_recommender_retraining
 
 ### Web Interface
 1. Open: `http://localhost:8000`
-2. Search for a movie
-3. Get 15 AI-powered recommendations
+2. Choose between:
+   - **Find similar movies**: Enter a movie name to get AI-powered recommendations (handles typos)
+   - **Genre search**: Select a genre to get top-rated movies from that category
+3. Get 15 personalized recommendations
 
 ### API Endpoints
 ```bash

@@ -121,6 +121,7 @@ class MovieRecommenderTrainer:
         df['keywords'] = df['keywords'].apply(lambda x: self.parse_json_column(x, 'name'))
         df['companies'] = df['production_companies'].apply(lambda x: self.parse_json_column(x, 'name'))
         df['countries'] = df['production_countries'].apply(lambda x: self.parse_json_column(x, 'name'))
+        df['spoken_languages'] = df['spoken_languages'].apply(lambda x: self.parse_json_column(x, 'name'))
         
         # Extract primary production company as director proxy
         df['primary_company'] = df['companies'].apply(lambda x: x[0] if x else None)
@@ -158,6 +159,11 @@ class MovieRecommenderTrainer:
         # Clean countries
         df['countries_clean'] = df['countries'].apply(
             lambda x: [country.lower().replace(" ", "") for country in x[:2]]
+        )
+        
+        # Clean spoken languages
+        df['spoken_languages_clean'] = df['spoken_languages'].apply(
+            lambda x: [lang.lower().replace(" ", "") for lang in x[:3]]
         )
         
         # Create comprehensive soup feature
@@ -281,7 +287,10 @@ class MovieRecommenderTrainer:
         metadata_df = df[[
             'id', 'title', 'release_date', 'primary_company', 
             'genres', 'vote_average', 'vote_count', 'popularity',
-            'overview', 'imdb_id', 'poster_path'
+            'overview', 'imdb_id', 'poster_path', 'spoken_languages',
+            'original_language', 'runtime', 'budget', 'revenue',
+            'adult', 'status', 'backdrop_path', 'homepage',
+            'production_countries', 'production_companies'
         ]].copy()
         
         metadata_df.to_parquet(

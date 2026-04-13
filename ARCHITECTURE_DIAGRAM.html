@@ -175,7 +175,7 @@ graph TB
     
     subgraph WEB["🔗 WEB APPLICATION LAYER"]
         Django["Django 6.0 Backend<br/>views.py + urls.py"]
-        FuzzyMatch["🔍 Fuzzy Matching<br/>get_close_matches<br/>difflib"]
+        FuzzyMatch["🔍 Advanced Fuzzy Matching<br/>Levenshtein Distance<br/>Handles Typos (startwars→Star Wars)"]
         HealthCheck["💚 Health Check<br/>Model Status"]
     end
     
@@ -293,7 +293,7 @@ graph TB
                 
                 <div class="legend-item">
                     <strong>🔗 Web Application Layer</strong>
-                    <p><strong>Django 6.0</strong> backend processes requests, <strong>Fuzzy Matching</strong> (difflib) finds user's movie, <strong>Health Check</strong> validates model status. Runs on 0.0.0.0:8000.</p>
+                    <p><strong>Django 6.0</strong> backend processes requests, <strong>Advanced Fuzzy Matching</strong> (Levenshtein distance) finds user's movie even with typos, <strong>Health Check</strong> validates model status. Supports separate movie recommendation and genre discovery modes. Runs on 0.0.0.0:8000.</p>
                 </div>
                 
                 <div class="legend-item">
@@ -318,12 +318,12 @@ graph TB
 
                 <div class="legend-item">
                     <strong>⚡ Performance Characteristics</strong>
-                    <p><strong>Request latency:</strong> &lt;200ms (fuzzy match + similarity lookup). <strong>Model load:</strong> ~2 seconds (background thread). <strong>Weekly retrain:</strong> 15-20 minutes. <strong>Model accuracy:</strong> Evaluated with Recall@15 and NDCG metrics.</p>
+                    <p><strong>Request latency:</strong> &lt;200ms (Levenshtein fuzzy match + similarity lookup). <strong>Model load:</strong> ~2 seconds (background thread). <strong>Weekly retrain:</strong> 15-20 minutes. <strong>Model accuracy:</strong> Evaluated with Recall@15 and NDCG metrics. <strong>Fuzzy matching:</strong> Handles typos and partial matches with intelligent scoring.</p>
                 </div>
 
                 <div class="legend-item">
                     <strong>🔄 Request Flow</strong>
-                    <p>User searches → Django fuzzy-matches title → Gets movie index → Loads precomputed similarities → Returns top 15 + metadata. All data cached in memory for instant response.</p>
+                    <p>User selects search mode (movie recommendations or genre discovery) → Django processes request → For movie search: fuzzy-matches title with Levenshtein distance → Gets movie index → Loads precomputed similarities → Returns top 15 + metadata. For genre search: filters by genre and sorts by rating. All data cached in memory for instant response.</p>
                 </div>
             </div>
         </div>
@@ -331,7 +331,7 @@ graph TB
         <div class="footer">
             <p>💡 <strong>Tech Stack:</strong> Django 6.0 | Apache Airflow 2.10.4 | scikit-learn (TF-IDF, SVD) | scipy.sparse | Kaggle TMDB API</p>
             <p style="margin-top: 8px;">⚡ <strong>Request Flow:</strong> &lt;200ms | 🏋️ <strong>Daily Training:</strong> 15-20min | 💾 <strong>Model Size:</strong> 145MB sparse matrix | 📊 <strong>Dataset:</strong> 1.4M TMDB movies</p>
-            <p style="margin-top: 10px; color: #999;">Generated: April 13, 2026 | v2.0 - Detailed Technical Architecture with Subgraph Organization</p>
+            <p style="margin-top: 10px; color: #999;">Generated: April 13, 2026 | v2.1 - Advanced Fuzzy Matching & Dual Search Modes</p>
         </div>
     </div>
     
